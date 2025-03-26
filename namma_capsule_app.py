@@ -4,6 +4,38 @@ import random
 from datetime import datetime
 import os
 
+# Page config
+st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="🗞️", layout="centered")
+
+# Custom CSS for chatbot look & mobile friendliness
+st.markdown("""
+    <style>
+        .stApp {
+            background-color: #f7f9fc;
+            padding: 2rem;
+        }
+        .chat-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: auto;
+        }
+        .chat-header {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .message-input input {
+            padding: 0.75rem;
+            border-radius: 1rem;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # Secure API key handling
 openai.api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
 
@@ -35,34 +67,33 @@ sponsors = [
     "📣 Snap Prints | Print-on-Demand Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)"
 ]
 
-# App Title
-st.title("🗞️ Mana Capsule - Hyderabad Top 10 News")
+# Chat UI container
+with st.container():
+    st.markdown("""<div class='chat-container'>""", unsafe_allow_html=True)
+    st.markdown("<div class='chat-header'>🤖 Mana Capsule - Your Hyderabad News Bot</div>", unsafe_allow_html=True)
+    user_input = st.text_input("", placeholder="Top 10 Hyderabad news today", label_visibility="collapsed")
 
-# User Input
-user_input = st.text_input("Ask Mana Capsule", placeholder="Top 10 Hyderabad news today")
+    if user_input:
+        valid_today = user_input.strip().lower() == "top 10 hyderabad news today"
+        valid_date_format = False
+        query_date = None
 
-if user_input:
-    valid_today = user_input.strip().lower() == "top 10 hyderabad news today"
-    valid_date_format = False
-    query_date = None
+        try:
+            if valid_today:
+                query_date = datetime.today()
+                valid_date_format = True
+            elif "top 10 hyderabad news" in user_input.lower():
+                date_part = user_input.lower().replace("top 10 hyderabad news", "").strip()
+                query_date = datetime.strptime(date_part, "%B %d, %Y")
+                valid_date_format = True
+        except Exception as e:
+            st.error("⚠️ Date parsing failed. Use format: Top 10 Hyderabad news [Month DD, YYYY]")
 
-    try:
-        if valid_today:
-            query_date = datetime.today()
-            valid_date_format = True
-        elif "top 10 hyderabad news" in user_input.lower():
-            date_part = user_input.lower().replace("top 10 hyderabad news", "").strip()
-            query_date = datetime.strptime(date_part, "%B %d, %Y")
-            valid_date_format = True
-    except Exception as e:
-        st.error("Date parsing failed. Please use the correct format: Top 10 Hyderabad news [Month DD, YYYY]")
+        if valid_today or valid_date_format:
+            shuffled_sponsors = random.sample(sponsors, len(sponsors))
+            formatted_date = query_date.strftime('%B %d, %Y')
 
-    if valid_today or valid_date_format:
-        shuffled_sponsors = random.sample(sponsors, len(sponsors))
-
-        formatted_date = query_date.strftime('%B %d, %Y')
-
-        prompt = f"""
+            prompt = f"""
 You are 'Mana Capsule', a hyper-local news summarizer. Provide exactly 10 news summaries for Hyderabad on {formatted_date}.
 Categories:
 {', '.join(categories)}
@@ -78,19 +109,20 @@ Sponsor lines (shuffled order):
 {shuffled_sponsors}
 """
 
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.5,
-                max_tokens=1200
-            )
+            try:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.5,
+                    max_tokens=1200
+                )
 
-            news_summaries = response.choices[0].message.content
-            st.markdown(news_summaries, unsafe_allow_html=True)
+                news_summaries = response.choices[0].message.content
+                st.markdown(news_summaries, unsafe_allow_html=True)
 
-        except Exception as e:
-            st.error(f"Failed to fetch news from OpenAI: {e}")
+            except Exception as e:
+                st.error(f"❌ Failed to fetch news: {e}")
 
-    else:
-        st.error("Please type your question in the correct format: Top 10 Hyderabad news today or Top 10 Hyderabad news [DATE].")
+        else:
+            st.warning("⚠️ Use correct format: Top 10 Hyderabad news today or Top 10 Hyderabad news [DATE].")
+    st.markdown("""</div>""", unsafe_allow_html=True)
