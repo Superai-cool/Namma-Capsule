@@ -5,35 +5,52 @@ from datetime import datetime
 import os
 
 # Page config
-st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="🗞️", layout="centered")
+st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="🗞️", layout="wide")
 
-# Enhanced CSS for new-age and mobile-friendly UI
+# Custom full-screen background and sleek UI
 st.markdown("""
     <style>
         .stApp {
-            background: linear-gradient(to right, #e3f2fd, #fce4ec);
+            background: url("https://images.unsplash.com/photo-1612831455546-74c4643a6e76?auto=format&fit=crop&w=1950&q=80") no-repeat center center fixed;
+            background-size: cover;
             font-family: 'Segoe UI', sans-serif;
+            color: #ffffff;
         }
-        .chat-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 95%;
-            width: 700px;
-            margin: 2rem auto;
-            border: 1px solid #e0e0e0;
-        }
-        .chat-header {
-            font-size: 1.8rem;
-            font-weight: 700;
+        .center-box {
             text-align: center;
-            margin-bottom: 2rem;
-            color: #0d47a1;
+            margin-top: 20vh;
         }
-        .stMarkdown p {
-            font-size: 1rem;
-            line-height: 1.6;
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+            margin-bottom: 2rem;
+        }
+        .news-button {
+            background-color: #e53935;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 0.75rem 2rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+        }
+        .news-button:hover {
+            background-color: #d32f2f;
+        }
+        .news-box {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            border-radius: 20px;
+            color: white;
         }
         .source-line, .sponsor-line {
             display: block;
@@ -41,29 +58,14 @@ st.markdown("""
             font-size: 0.92rem;
         }
         .source-line {
-            color: #0d47a1;
+            color: #90caf9;
         }
         .sponsor-line {
-            color: #2e7d32;
+            color: #a5d6a7;
         }
         hr {
-            margin-top: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .trigger-button {
-            display: block;
-            margin: 0 auto 2rem auto;
-            padding: 0.75rem 1.5rem;
-            font-size: 1.1rem;
-            background-color: #0d47a1;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .trigger-button:hover {
-            background-color: #1565c0;
+            border-top: 1px solid #ffffff33;
+            margin: 1.5rem 0;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -99,17 +101,24 @@ sponsors = [
     "📣 Snap Prints | Print-on-Demand Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)"
 ]
 
-# Chat UI container
-with st.container():
-    st.markdown("""<div class='chat-container'>""", unsafe_allow_html=True)
-    st.markdown("<div class='chat-header'>📰 Mana Capsule - Top 10 Hyderabad News</div>", unsafe_allow_html=True)
+# UI Header Section
+st.markdown("""
+    <div class='center-box'>
+        <div class='main-title'>📰 Mana Capsule</div>
+        <div class='subtitle'>Your daily dose of Hyderabad news, condensed into 10 essential updates.</div>
+""", unsafe_allow_html=True)
 
-    if st.button("Get Top 10 Hyderabad News Today", key="today_button"):
-        query_date = datetime.today()
-        shuffled_sponsors = random.sample(sponsors, len(sponsors))
-        formatted_date = query_date.strftime('%B %d, %Y')
+# Button
+get_news = st.button("Tell me Today's Top 10 News", key="today_btn")
 
-        prompt = f"""
+st.markdown("</div>", unsafe_allow_html=True)
+
+if get_news:
+    query_date = datetime.today()
+    shuffled_sponsors = random.sample(sponsors, len(sponsors))
+    formatted_date = query_date.strftime('%B %d, %Y')
+
+    prompt = f"""
 You are 'Mana Capsule', a hyper-local news summarizer. Provide exactly 10 news summaries for Hyderabad on {formatted_date}.
 Categories:
 {', '.join(categories)}
@@ -125,18 +134,16 @@ Sponsor lines (shuffled order):
 {shuffled_sponsors}
 """
 
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.5,
-                max_tokens=1200
-            )
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=1200
+        )
 
-            news_summaries = response.choices[0].message.content
-            st.markdown(news_summaries, unsafe_allow_html=True)
+        news_summaries = response.choices[0].message.content
+        st.markdown(f"<div class='news-box'>{news_summaries}</div>", unsafe_allow_html=True)
 
-        except Exception as e:
-            st.error(f"❌ Failed to fetch news: {e}")
-
-    st.markdown("""</div>""", unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"❌ Failed to fetch news: {e}")
