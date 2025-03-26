@@ -131,9 +131,10 @@ if trigger_today:
 You are 'Mana Capsule', a hyper-local news summarizer exclusively focused on delivering the Top 10 daily news summaries relevant to Hyderabad, across 10 fixed categories. You include national or global developments only when directly connected to one of these categories with a clear Hyderabad angle.
 
 Respond only in this format:
-1. **Category | {formatted_date}**\nSummary (within 60 words)
+1. **Category | {formatted_date}**
+Summary (within 60 words)
 
-📰 Source: Name – [Read More](https://example.com)
+📰 Source: Source Name – [Read More](https://example.com)
 
 📣 Sponsor line
 
@@ -149,7 +150,7 @@ Use one sponsor per item (shuffled):
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.5,
-            max_tokens=1600
+            max_tokens=1800
         )
 
         summaries = response.choices[0].message.content
