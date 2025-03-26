@@ -7,7 +7,7 @@ import os
 # Page config
 st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="🗞️", layout="centered")
 
-# Beautiful UI enhancements
+# Enhanced CSS for mobile-friendly styling
 st.markdown("""
     <style>
         .stApp {
@@ -19,12 +19,13 @@ st.markdown("""
             padding: 2rem;
             border-radius: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 700px;
-            margin: 3rem auto;
+            max-width: 95%;
+            width: 700px;
+            margin: 2rem auto;
             border: 1px solid #e0e0e0;
         }
         .chat-header {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             text-align: center;
             margin-bottom: 1.5rem;
@@ -36,12 +37,24 @@ st.markdown("""
             border: 1px solid #bdbdbd;
             background-color: #f9f9f9;
         }
-        .stMarkdown {
-            font-size: 1.05rem;
+        .stMarkdown p {
+            font-size: 1rem;
             line-height: 1.6;
         }
-        .stError, .stWarning {
-            border-radius: 10px;
+        .source-line, .sponsor-line {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.92rem;
+        }
+        .source-line {
+            color: #0d47a1;
+        }
+        .sponsor-line {
+            color: #2e7d32;
+        }
+        hr {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -111,8 +124,8 @@ Categories:
 Format each summary strictly as follows:
 Number. **Category | {formatted_date}**
 Summary (within 60 words)
-📰 Source: Name – [Read More](https://example.com)
-Sponsor line
+<span class='source-line'>📰 Source: Name – [Read More](https://example.com)</span>
+<span class='sponsor-line'>SPONSOR</span>
 ---
 Ensure each category is covered, summaries are concise, factual, strictly under 60 words, and relevant exclusively to Hyderabad.
 Sponsor lines (shuffled order):
