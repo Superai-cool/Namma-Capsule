@@ -1,4 +1,4 @@
-import streamlit as st
+""import streamlit as st
 import openai
 import random
 from datetime import datetime
@@ -7,76 +7,64 @@ import os
 # Page config
 st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="🗞️", layout="wide")
 
-# Tailwind-style-inspired HTML for UI rendering
+# Custom styles for clean news card format
 st.markdown("""
     <style>
         .stApp {
-            background: black;
             font-family: 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #111827;
         }
-        .main-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-        .box {
-            text-align: center;
-            padding: 2rem;
-        }
-        .news-button {
-            margin-top: 1.5rem;
-            background-color: #dc2626;
-            color: white;
-            font-weight: 600;
-            font-size: 1.1rem;
-            padding: 0.75rem 2rem;
-            border-radius: 9999px;
-            border: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            cursor: pointer;
-            transition: 0.3s ease;
-        }
-        .news-button:hover {
-            background-color: #b91c1c;
-        }
-        .news-box {
-            background-color: rgba(0, 0, 0, 0.85);
-            padding: 2rem;
-            margin: 2rem auto;
+        .news-card {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            margin: 1.5rem auto;
+            border-radius: 1rem;
             max-width: 800px;
-            border-radius: 20px;
-            color: white;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
         }
-        .source-line {
-            color: #90caf9;
-            margin-top: 0.5rem;
+        .news-card h3 {
+            margin: 0.5rem 0;
+            font-size: 1.25rem;
         }
-        .sponsor-line {
-            color: #a5d6a7;
+        .news-card p {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+        .category-label {
+            background-color: #e5e7eb;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 0.25rem;
+        }
+        .news-date {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-align: right;
+        }
+        .source-line, .sponsor-line {
+            display: block;
+            font-size: 0.875rem;
             margin-top: 0.25rem;
         }
+        .source-line {
+            color: #1d4ed8;
+        }
+        .sponsor-line {
+            color: #16a34a;
+        }
         hr {
-            border-top: 1px solid #ffffff33;
-            margin: 1.5rem 0;
+            border-top: 1px solid #e5e7eb;
+            margin: 1rem 0;
         }
     </style>
-
-    <div class='main-container'>
-      <div class='box'>
-        <div style='font-size: 2.5rem;'>📰</div>
-        <h1 style='font-size: 2rem; font-weight: bold;'>Mana Capsule</h1>
-        <p style='color: #ccc; font-size: 1.1rem; margin-top: 1rem;'>
-          Your daily dose of Hyderabad news, condensed<br>
-          into 10 essential updates.
-        </p>
-      </div>
-    </div>
 """, unsafe_allow_html=True)
 
 # API Key
-openai.api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
+openai.api_key = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
 
 categories = [
     "Hyderabad Local News",
@@ -104,7 +92,14 @@ sponsors = [
     "📣 Snap Prints | Print-on-Demand Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)"
 ]
 
-# Button Logic
+# Header
+st.markdown("""
+    <div style='text-align: center; padding-top: 3rem;'>
+        <h1 style='font-size: 2.5rem; font-weight: 700;'>📰 Mana Capsule</h1>
+        <p style='color: #374151;'>Top 10 Hyderabad News</p>
+    </div>
+""", unsafe_allow_html=True)
+
 if st.button("Tell me Today’s Top 10 News", key="today_btn"):
     query_date = datetime.today()
     formatted_date = query_date.strftime('%B %d, %Y')
@@ -118,8 +113,8 @@ Categories:
 Format each summary strictly as follows:
 Number. **Category | {formatted_date}**
 Summary (within 60 words)
-<span class='source-line'>📰 Source: Name – [Read More](https://example.com)</span>
-<span class='sponsor-line'>SPONSOR</span>
+📰 Source: Name – [Read More](https://example.com)
+📣 SPONSOR
 ---
 Ensure each category is covered, summaries are concise, factual, strictly under 60 words, and relevant exclusively to Hyderabad.
 Sponsor lines (shuffled order):
@@ -134,8 +129,16 @@ Sponsor lines (shuffled order):
             max_tokens=1200
         )
 
-        news_summaries = response.choices[0].message.content
-        st.markdown(f"<div class='news-box'>{news_summaries}</div>", unsafe_allow_html=True)
+        summaries = response.choices[0].message.content
+
+        # Render cleanly
+        st.markdown(f"""
+        <div class='news-card'>
+            <div class='category-label'>Hyderabad</div>
+            <div class='news-date'>{formatted_date}</div>
+            {summaries}
+        </div>
+        """, unsafe_allow_html=True)
 
     except Exception as e:
         st.error(f"❌ Failed to fetch news: {e}")
