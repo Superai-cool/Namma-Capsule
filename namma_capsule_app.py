@@ -3,91 +3,87 @@ import openai
 import random
 from datetime import datetime
 
-# Securely load OpenAI API key from Streamlit secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Set your OpenAI API Key
+openai.api_key = 'YOUR_API_KEY'
 
-# Sponsor ads
-sponsors = [
-    "📣 *Powered by* [**Flatreads**](https://www.flatreads.com/) – *Your Apartment, Your City, Your Community.*",
-    "📣 *Sponsored by* [**BengaluruBytes**](https://www.bengalurubytes.com/) – *All about Bengaluru.*",
-    "📣 *Presented by* [**NammaMetro News**](https://www.nammametronews.com/) – *Stay connected.*",
-    "📣 *Supported by* [**Green Bengaluru**](https://www.greenbengaluru.org/) – *For a cleaner city.*",
-    "📣 *Brought to you by* [**TechCity Bangalore**](https://www.techcitybangalore.com/) – *Innovation at its best.*",
-    "📣 *In association with* [**HealthCity**](https://www.healthcitybangalore.com/) – *Your health, our priority.*",
-    "📣 *Powered by* [**EduBengaluru**](https://www.edubengaluru.com/) – *Empowering education.*",
-    "📣 *Sponsored by* [**BizBuzz Bangalore**](https://www.bizbuzzbangalore.com/) – *Business simplified.*",
-    "📣 *Presented by* [**CultureVibe**](https://www.culturevibe.in/) – *Celebrate Bengaluru’s culture.*",
-    "📣 *Supported by* [**InfraBengaluru**](https://www.infrabengaluru.com/) – *Building the future.*",
-]
-
-# Fixed categories
+# Fixed Categories
 categories = [
-    "Bengaluru Local News",
+    "Hyderabad Local News",
     "Politics",
-    "Startup",
+    "Economy/Business",
     "Education",
     "Technology",
     "Health",
     "Environment",
     "Sports",
-    "Entertainment",
-    "Real Estate"
+    "Culture/Entertainment",
+    "Infrastructure/Transport"
 ]
 
-def generate_news_summaries(query_date):
-    prompt = f"""
-    Generate exactly 10 Bengaluru-specific hyper-local news summaries strictly limited to 60 words each for the following categories on {query_date}:
-    {', '.join(categories)}.
-    Follow this format strictly for each summary:
+# Sponsor Lines
+sponsors = [
+    "📣 Fresh Bite | Meal Delivery Service | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 HomeFix | On-Demand Repair Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Skill Spark | Online Learning Platform | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Fit Nest | Personal Fitness Coaching | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Triptote | Custom Travel Planning | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Code Wave | Software Development Agency | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Zen Space | Interior Design Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Green Grow | Organic Grocery Delivery | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Care Crew | Elderly Home Care Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
+    "📣 Snap Prints | Print-on-Demand Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)"
+]
 
-    Category | Date
+# App Title
+st.title("🗞️ Mana Capsule - Hyderabad Top 10 News")
 
-    Summary (≤ 60 words)
+# User Input
+user_input = st.text_input("Ask Mana Capsule", placeholder="Top 10 Hyderabad news today")
 
-    📰 Source: Name – [Read More](link)
-    """
+# Input validation
+if user_input:
+    valid_today = user_input.strip().lower() == "top 10 hyderabad news today"
+    valid_date_format = False
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.5,
-        max_tokens=1000
-    )
+    try:
+        if "top 10 hyderabad news" in user_input.lower():
+            date_part = user_input.lower().replace("top 10 hyderabad news", "").strip()
+            query_date = datetime.strptime(date_part, "%B %d, %Y")
+            valid_date_format = True
+        elif valid_today:
+            query_date = datetime.today()
+            valid_date_format = True
+    except:
+        valid_date_format = False
 
-    return response['choices'][0]['message']['content'].strip().split('\n\n')
+    if valid_today or valid_date_format:
+        shuffled_sponsors = random.sample(sponsors, len(sponsors))
 
-# Streamlit App
-st.title("🗞️ Namma Capsule – Bengaluru's Hyper-local News")
+        prompt = f"""
+You are 'Mana Capsule', a hyper-local news summarizer. Provide exactly 10 news summaries for Hyderabad on {query_date.strftime('%B %d, %Y')}.
+Categories:
+{', '.join(categories)}
 
-query = st.text_input("Ask for top 10 Bengaluru news:")
+Format each summary strictly as follows:
+Number. **Category | {query_date.strftime('%B %d, %Y')}**
+Summary (within 60 words)
+📰 Source: Name – [Read More](https://example.com)
+Sponsor line
+---
+Ensure each category is covered, summaries are concise, factual, strictly under 60 words, and relevant exclusively to Hyderabad.
+Sponsor lines (shuffled order):
+{shuffled_sponsors}
+"""
 
-if query:
-    query = query.strip()
-    if query.lower() == "top 10 bangalore news today":
-        query_date = datetime.now().strftime('%d %B %Y')
-    elif query.lower().startswith("top 10 bangalore news"):
-        try:
-            query_date = query.split("news", 1)[1].strip()
-            datetime.strptime(query_date, '%d %B %Y')
-        except ValueError:
-            st.error("Please provide date in correct format: DD Month YYYY (e.g., 27 March 2025)")
-            st.stop()
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=1200
+        )
+
+        news_summaries = response.choices[0].message.content
+        st.markdown(news_summaries, unsafe_allow_html=True)
+
     else:
-        st.error("Please type your question in the correct format: **Top 10 Bangalore news today** or **Top 10 Bangalore news [DATE]**.")
-        st.stop()
-
-    with st.spinner('Fetching news summaries...'):
-        try:
-            summaries = generate_news_summaries(query_date)
-
-            random.shuffle(sponsors)
-
-            for i, summary in enumerate(summaries):
-                st.markdown(f"**{i+1}. {summary}**")
-                st.markdown(sponsors[i])
-                st.markdown('---')
-
-        except openai.error.AuthenticationError:
-            st.error("Invalid API Key. Please check your Streamlit secrets configuration.")
-        except Exception as e:
-            st.error(f"An error occurred: {str(e)}")
+        st.error("Please type your question in the correct format: Top 10 Hyderabad news today or Top 10 Hyderabad news [DATE].")
