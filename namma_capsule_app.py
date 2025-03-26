@@ -7,31 +7,41 @@ import os
 # Page config
 st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="🗞️", layout="centered")
 
-# Custom CSS for chatbot look & mobile friendliness
+# Beautiful UI enhancements
 st.markdown("""
     <style>
         .stApp {
-            background-color: #f7f9fc;
-            padding: 2rem;
+            background: linear-gradient(to right, #e3f2fd, #fce4ec);
+            font-family: 'Segoe UI', sans-serif;
         }
         .chat-container {
             background-color: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0px 0px 12px rgba(0,0,0,0.05);
-            max-width: 600px;
-            margin: auto;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            margin: 3rem auto;
+            border: 1px solid #e0e0e0;
         }
         .chat-header {
-            font-size: 1.5rem;
+            font-size: 2rem;
+            font-weight: 700;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            color: #0d47a1;
         }
-        .message-input input {
-            padding: 0.75rem;
-            border-radius: 1rem;
-            border: 1px solid #ccc;
-            width: 100%;
+        .stTextInput>div>div>input {
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid #bdbdbd;
+            background-color: #f9f9f9;
+        }
+        .stMarkdown {
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        .stError, .stWarning {
+            border-radius: 10px;
         }
     </style>
 """, unsafe_allow_html=True)
