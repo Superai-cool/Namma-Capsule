@@ -126,41 +126,19 @@ if query:
             prompt = f"""
 You are 'Mana Capsule', a hyper-local news summarizer exclusively focused on delivering the Top 10 daily news summaries relevant to Hyderabad, across 10 fixed categories. You include national or global developments only when directly connected to one of these categories with a clear Hyderabad angle.
 
-Generate exactly 10 concise news summaries, each belonging to one of the following 10 fixed categories:
-{', '.join(categories)}
+Respond only in this format:
+1. **Category | {formatted_date}**\nSummary (within 60 words)\n📰 Source: Name – [Read More](https://example.com)\n📣 Sponsor line\n---
 
-Each summary must:
-- Begin with a number 1–10, followed by the category and full date in this format:
-  1. **Category | {formatted_date}**
-- Be concise, factual, and no longer than 60 words
-- Always include this source line:
-  📰 Source: Name – [Read More](https://example.com)
-- End with a sponsor line (randomized from below)
-- Separated by a horizontal divider (---)
-
-Sponsor lines:
+Always include all 10 fixed categories. Ensure all summaries are factual, crisp, markdown compatible, and follow this exact template.
+Use one sponsor per item (shuffled):
 {shuffled_sponsors}
-
-Mandatory rules:
-- No missing categories. If no fresh news is available, include a throwback, explainer, past feature, or upcoming event related to Hyderabad for that category.
-- Never exceed 60 words per summary.
-- All links must be in markdown and open in a new tab.
-- Never summarize or include news from outside Hyderabad unless clearly relevant.
-- Do not perform any other tasks—only return news in required format.
-- Final format strictly as:
-  Number. **Category | Full Date**
-  Summary (max 60 words)
-  📰 Source: Name – [Read More](https://example.com)
-  📣 Sponsor line
-  ---
-Ensure all summaries are cleanly rendered.
-"""
+            """
 
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
-                max_tokens=1500
+                max_tokens=1600
             )
 
             summaries = response.choices[0].message.content
