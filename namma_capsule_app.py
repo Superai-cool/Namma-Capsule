@@ -7,73 +7,77 @@ import os
 # Page config
 st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="🗞️", layout="wide")
 
-# Custom full-screen background and sleek UI
+# Tailwind-style-inspired HTML for UI rendering
 st.markdown("""
     <style>
         .stApp {
-            background: url("https://raw.githubusercontent.com/supergovind/public-assets/main/images/mana-capsule-dark-bg.png") no-repeat center center fixed;
-            background-size: cover;
+            background: black;
             font-family: 'Segoe UI', sans-serif;
-            color: #ffffff;
         }
-        .center-box {
-            text-align: center;
-            margin-top: 20vh;
-        }
-        .main-title {
-            font-size: 2.6rem;
-            font-weight: bold;
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            margin-bottom: 0.25rem;
         }
-        .subtitle {
-            font-size: 1.1rem;
-            color: #d0d0d0;
-            margin-bottom: 2rem;
+        .box {
+            text-align: center;
+            padding: 2rem;
         }
         .news-button {
-            background-color: #e53935;
+            margin-top: 1.5rem;
+            background-color: #dc2626;
             color: white;
             font-weight: 600;
             font-size: 1.1rem;
             padding: 0.75rem 2rem;
-            border-radius: 30px;
+            border-radius: 9999px;
             border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             cursor: pointer;
+            transition: 0.3s ease;
         }
         .news-button:hover {
-            background-color: #d32f2f;
+            background-color: #b91c1c;
         }
         .news-box {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.85);
             padding: 2rem;
             margin: 2rem auto;
             max-width: 800px;
             border-radius: 20px;
             color: white;
         }
-        .source-line, .sponsor-line {
-            display: block;
-            margin-top: 0.5rem;
-            font-size: 0.92rem;
-        }
         .source-line {
             color: #90caf9;
+            margin-top: 0.5rem;
         }
         .sponsor-line {
             color: #a5d6a7;
+            margin-top: 0.25rem;
         }
         hr {
             border-top: 1px solid #ffffff33;
             margin: 1.5rem 0;
         }
     </style>
+
+    <div class='main-container'>
+      <div class='box'>
+        <div style='font-size: 2.5rem;'>📰</div>
+        <h1 style='font-size: 2rem; font-weight: bold;'>Mana Capsule</h1>
+        <p style='color: #ccc; font-size: 1.1rem; margin-top: 1rem;'>
+          Your daily dose of Hyderabad news, condensed<br>
+          into 10 essential updates.
+        </p>
+      </div>
+    </div>
 """, unsafe_allow_html=True)
 
-# Secure API key handling
+# API Key
 openai.api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
 
-# Fixed Categories
 categories = [
     "Hyderabad Local News",
     "Politics",
@@ -87,7 +91,6 @@ categories = [
     "Infrastructure/Transport"
 ]
 
-# Sponsor Lines
 sponsors = [
     "📣 Fresh Bite | Meal Delivery Service | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
     "📣 HomeFix | On-Demand Repair Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)",
@@ -101,22 +104,11 @@ sponsors = [
     "📣 Snap Prints | Print-on-Demand Services | [WhatsApp : 8830720742](https://wa.link/mwb2hf)"
 ]
 
-# UI Header Section
-st.markdown("""
-    <div class='center-box'>
-        <div class='main-title'>🗞️ Mana Capsule</div>
-        <div class='subtitle'>Your daily dose of Hyderabad news, condensed into 10 essential updates.</div>
-""", unsafe_allow_html=True)
-
-# Button
-get_news = st.button("Tell me Today’s Top 10 News", key="today_btn")
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-if get_news:
+# Button Logic
+if st.button("Tell me Today’s Top 10 News", key="today_btn"):
     query_date = datetime.today()
-    shuffled_sponsors = random.sample(sponsors, len(sponsors))
     formatted_date = query_date.strftime('%B %d, %Y')
+    shuffled_sponsors = random.sample(sponsors, len(sponsors))
 
     prompt = f"""
 You are 'Mana Capsule', a hyper-local news summarizer. Provide exactly 10 news summaries for Hyderabad on {formatted_date}.
