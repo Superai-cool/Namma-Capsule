@@ -2,9 +2,10 @@ import streamlit as st
 import openai
 import random
 from datetime import datetime
+import os
 
-# Set your OpenAI API Key
-openai.api_key = 'YOUR_API_KEY'
+# Secure API key handling
+openai.api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
 
 # Fixed Categories
 categories = [
