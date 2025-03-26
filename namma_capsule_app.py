@@ -1,4 +1,4 @@
-import streamlit as st
+""import streamlit as st
 import openai
 import random
 from datetime import datetime
@@ -60,6 +60,23 @@ st.markdown("""
             border-top: 1px solid #e5e7eb;
             margin: 1rem 0;
         }
+        .center-btn {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .center-btn button {
+            background-color: #dc2626;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+        .center-btn button:hover {
+            background-color: #b91c1c;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -100,30 +117,17 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-query = st.text_input("Ask Mana Capsule", placeholder="Top 10 Hyderabad news today")
+# Button-based trigger
+st.markdown("<div class='center-btn'>", unsafe_allow_html=True)
+trigger_today = st.button("Tell me Today's Top 10 News")
+st.markdown("</div>", unsafe_allow_html=True)
 
-valid_today = "top 10 hyderabad news today"
-valid_date_format = "top 10 hyderabad news "
+if trigger_today:
+    query_date = datetime.today()
+    formatted_date = query_date.strftime('%B %d, %Y')
+    shuffled_sponsors = random.sample(sponsors, len(sponsors))
 
-if query:
-    q_lower = query.lower().strip()
-    if q_lower == valid_today or (q_lower.startswith(valid_date_format) and len(q_lower.split()) >= 5):
-        try:
-            # Parse date if provided
-            if q_lower == valid_today:
-                query_date = datetime.today()
-            else:
-                try:
-                    date_str = query[len(valid_date_format):].strip()
-                    query_date = datetime.strptime(date_str, "%B %d, %Y")
-                except ValueError:
-                    st.error("Please enter the date in the format: Top 10 Hyderabad news March 25, 2025")
-                    st.stop()
-
-            formatted_date = query_date.strftime('%B %d, %Y')
-            shuffled_sponsors = random.sample(sponsors, len(sponsors))
-
-            prompt = f"""
+    prompt = f"""
 You are 'Mana Capsule', a hyper-local news summarizer exclusively focused on delivering the Top 10 daily news summaries relevant to Hyderabad, across 10 fixed categories. You include national or global developments only when directly connected to one of these categories with a clear Hyderabad angle.
 
 Respond only in this format:
@@ -132,19 +136,18 @@ Respond only in this format:
 Always include all 10 fixed categories. Ensure all summaries are factual, crisp, markdown compatible, and follow this exact template.
 Use one sponsor per item (shuffled):
 {shuffled_sponsors}
-            """
+    """
 
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.5,
-                max_tokens=1600
-            )
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=1600
+        )
 
-            summaries = response.choices[0].message.content
-            st.markdown(f"<div class='news-card'><div class='news-date'>{formatted_date}</div>{summaries}</div>", unsafe_allow_html=True)
+        summaries = response.choices[0].message.content
+        st.markdown(f"<div class='news-card'><div class='news-date'>{formatted_date}</div>{summaries}</div>", unsafe_allow_html=True)
 
-        except Exception as e:
-            st.error(f"❌ Failed to fetch news: {e}")
-    else:
-        st.warning("Please type your question in the correct format: Top 10 Hyderabad news today or Top 10 Hyderabad news [DATE].")
+    except Exception as e:
+        st.error(f"❌ Failed to fetch news: {e}")
