@@ -100,45 +100,73 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-if st.button("Tell me Today’s Top 10 News", key="today_btn"):
-    query_date = datetime.today()
-    formatted_date = query_date.strftime('%B %d, %Y')
-    shuffled_sponsors = random.sample(sponsors, len(sponsors))
+query = st.text_input("Ask Mana Capsule", placeholder="Top 10 Hyderabad news today")
 
-    prompt = f"""
-You are 'Mana Capsule', a hyper-local news summarizer. Provide exactly 10 news summaries for Hyderabad on {formatted_date}.
-Categories:
+valid_today = "top 10 hyderabad news today"
+valid_date_format = "top 10 hyderabad news "
+
+if query:
+    q_lower = query.lower().strip()
+    if q_lower == valid_today or (q_lower.startswith(valid_date_format) and len(q_lower.split()) >= 5):
+        try:
+            # Parse date if provided
+            if q_lower == valid_today:
+                query_date = datetime.today()
+            else:
+                try:
+                    date_str = query[len(valid_date_format):].strip()
+                    query_date = datetime.strptime(date_str, "%B %d, %Y")
+                except ValueError:
+                    st.error("Please enter the date in the format: Top 10 Hyderabad news March 25, 2025")
+                    st.stop()
+
+            formatted_date = query_date.strftime('%B %d, %Y')
+            shuffled_sponsors = random.sample(sponsors, len(sponsors))
+
+            prompt = f"""
+You are 'Mana Capsule', a hyper-local news summarizer exclusively focused on delivering the Top 10 daily news summaries relevant to Hyderabad, across 10 fixed categories. You include national or global developments only when directly connected to one of these categories with a clear Hyderabad angle.
+
+Generate exactly 10 concise news summaries, each belonging to one of the following 10 fixed categories:
 {', '.join(categories)}
 
-Format each summary strictly as follows:
-Number. **Category | {formatted_date}**
-Summary (within 60 words)
-📰 Source: Name – [Read More](https://example.com)
-📣 SPONSOR
----
-Ensure each category is covered, summaries are concise, factual, strictly under 60 words, and relevant exclusively to Hyderabad.
-Sponsor lines (shuffled order):
+Each summary must:
+- Begin with a number 1–10, followed by the category and full date in this format:
+  1. **Category | {formatted_date}**
+- Be concise, factual, and no longer than 60 words
+- Always include this source line:
+  📰 Source: Name – [Read More](https://example.com)
+- End with a sponsor line (randomized from below)
+- Separated by a horizontal divider (---)
+
+Sponsor lines:
 {shuffled_sponsors}
+
+Mandatory rules:
+- No missing categories. If no fresh news is available, include a throwback, explainer, past feature, or upcoming event related to Hyderabad for that category.
+- Never exceed 60 words per summary.
+- All links must be in markdown and open in a new tab.
+- Never summarize or include news from outside Hyderabad unless clearly relevant.
+- Do not perform any other tasks—only return news in required format.
+- Final format strictly as:
+  Number. **Category | Full Date**
+  Summary (max 60 words)
+  📰 Source: Name – [Read More](https://example.com)
+  📣 Sponsor line
+  ---
+Ensure all summaries are cleanly rendered.
 """
 
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5,
-            max_tokens=1200
-        )
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5,
+                max_tokens=1500
+            )
 
-        summaries = response.choices[0].message.content
+            summaries = response.choices[0].message.content
+            st.markdown(f"<div class='news-card'><div class='news-date'>{formatted_date}</div>{summaries}</div>", unsafe_allow_html=True)
 
-        # Render cleanly
-        st.markdown(f"""
-        <div class='news-card'>
-            <div class='category-label'>Hyderabad</div>
-            <div class='news-date'>{formatted_date}</div>
-            {summaries}
-        </div>
-        """, unsafe_allow_html=True)
-
-    except Exception as e:
-        st.error(f"❌ Failed to fetch news: {e}")
+        except Exception as e:
+            st.error(f"❌ Failed to fetch news: {e}")
+    else:
+        st.warning("Please type your question in the correct format: Top 10 Hyderabad news today or Top 10 Hyderabad news [DATE].")
