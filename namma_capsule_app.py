@@ -134,13 +134,13 @@ Respond only in this format:
 1. **Category | {formatted_date}**
 Summary (within 60 words)
 
-📰 Source: Source Name – [Read More](https://example.com)
+📰 Source: Source Name – <a href="https://example.com" target="_blank">Read More</a>
 
 📣 Sponsor line
 
 ---
 
-Always include all 10 fixed categories. Ensure all summaries are factual, crisp, markdown compatible, and follow this exact template.
+Always include all 10 fixed categories. Ensure all summaries are factual, crisp, HTML/markdown compatible, and follow this exact template.
 Use one sponsor per item (shuffled):
 {shuffled_sponsors}
     """
