@@ -1,4 +1,4 @@
-import streamlit as st
+""import streamlit as st
 import openai
 import random
 from datetime import datetime
@@ -11,7 +11,7 @@ st.set_page_config(page_title="Mana Capsule - Hyderabad News Bot", page_icon="�
 st.markdown("""
     <style>
         .stApp {
-            background: url("https://images.unsplash.com/photo-1612831455546-74c4643a6e76?auto=format&fit=crop&w=1950&q=80") no-repeat center center fixed;
+            background: url("https://raw.githubusercontent.com/supergovind/public-assets/main/images/mana-capsule-dark-bg.png") no-repeat center center fixed;
             background-size: cover;
             font-family: 'Segoe UI', sans-serif;
             color: #ffffff;
@@ -21,14 +21,14 @@ st.markdown("""
             margin-top: 20vh;
         }
         .main-title {
-            font-size: 2.5rem;
+            font-size: 2.6rem;
             font-weight: bold;
             color: white;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
         .subtitle {
-            font-size: 1.2rem;
-            color: #cccccc;
+            font-size: 1.1rem;
+            color: #d0d0d0;
             margin-bottom: 2rem;
         }
         .news-button {
@@ -45,7 +45,7 @@ st.markdown("""
             background-color: #d32f2f;
         }
         .news-box {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
             padding: 2rem;
             margin: 2rem auto;
             max-width: 800px;
@@ -104,12 +104,12 @@ sponsors = [
 # UI Header Section
 st.markdown("""
     <div class='center-box'>
-        <div class='main-title'>📰 Mana Capsule</div>
+        <div class='main-title'>🗞️ Mana Capsule</div>
         <div class='subtitle'>Your daily dose of Hyderabad news, condensed into 10 essential updates.</div>
 """, unsafe_allow_html=True)
 
 # Button
-get_news = st.button("Tell me Today's Top 10 News", key="today_btn")
+get_news = st.button("Tell me Today’s Top 10 News", key="today_btn")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
