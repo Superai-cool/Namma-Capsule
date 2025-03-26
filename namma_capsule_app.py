@@ -40,32 +40,34 @@ st.title("🗞️ Mana Capsule - Hyderabad Top 10 News")
 # User Input
 user_input = st.text_input("Ask Mana Capsule", placeholder="Top 10 Hyderabad news today")
 
-# Input validation
 if user_input:
     valid_today = user_input.strip().lower() == "top 10 hyderabad news today"
     valid_date_format = False
+    query_date = None
 
     try:
-        if "top 10 hyderabad news" in user_input.lower():
+        if valid_today:
+            query_date = datetime.today()
+            valid_date_format = True
+        elif "top 10 hyderabad news" in user_input.lower():
             date_part = user_input.lower().replace("top 10 hyderabad news", "").strip()
             query_date = datetime.strptime(date_part, "%B %d, %Y")
             valid_date_format = True
-        elif valid_today:
-            query_date = datetime.today()
-            valid_date_format = True
-    except:
-        valid_date_format = False
+    except Exception as e:
+        st.error("Date parsing failed. Please use the correct format: Top 10 Hyderabad news [Month DD, YYYY]")
 
     if valid_today or valid_date_format:
         shuffled_sponsors = random.sample(sponsors, len(sponsors))
 
+        formatted_date = query_date.strftime('%B %d, %Y')
+
         prompt = f"""
-You are 'Mana Capsule', a hyper-local news summarizer. Provide exactly 10 news summaries for Hyderabad on {query_date.strftime('%B %d, %Y')}.
+You are 'Mana Capsule', a hyper-local news summarizer. Provide exactly 10 news summaries for Hyderabad on {formatted_date}.
 Categories:
 {', '.join(categories)}
 
 Format each summary strictly as follows:
-Number. **Category | {query_date.strftime('%B %d, %Y')}**
+Number. **Category | {formatted_date}**
 Summary (within 60 words)
 📰 Source: Name – [Read More](https://example.com)
 Sponsor line
@@ -75,15 +77,19 @@ Sponsor lines (shuffled order):
 {shuffled_sponsors}
 """
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5,
-            max_tokens=1200
-        )
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5,
+                max_tokens=1200
+            )
 
-        news_summaries = response.choices[0].message.content
-        st.markdown(news_summaries, unsafe_allow_html=True)
+            news_summaries = response.choices[0].message.content
+            st.markdown(news_summaries, unsafe_allow_html=True)
+
+        except Exception as e:
+            st.error(f"Failed to fetch news from OpenAI: {e}")
 
     else:
         st.error("Please type your question in the correct format: Top 10 Hyderabad news today or Top 10 Hyderabad news [DATE].")
