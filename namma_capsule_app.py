@@ -48,7 +48,7 @@ st.markdown("""
         .source-line, .sponsor-line {
             display: block;
             font-size: 0.875rem;
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
         }
         .source-line {
             color: #1d4ed8;
@@ -131,7 +131,7 @@ if trigger_today:
 You are 'Mana Capsule', a hyper-local news summarizer exclusively focused on delivering the Top 10 daily news summaries relevant to Hyderabad, across 10 fixed categories. You include national or global developments only when directly connected to one of these categories with a clear Hyderabad angle.
 
 Respond only in this format:
-1. **Category | {formatted_date}**\nSummary (within 60 words)\n📰 Source: Name – [Read More](https://example.com)\n📣 Sponsor line\n---
+1. **Category | {formatted_date}**\nSummary (within 60 words)\n\n📰 Source: Name – [Read More](https://example.com)\n📣 Sponsor line\n---
 
 Always include all 10 fixed categories. Ensure all summaries are factual, crisp, markdown compatible, and follow this exact template.
 Use one sponsor per item (shuffled):
