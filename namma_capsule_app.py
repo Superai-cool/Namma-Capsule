@@ -1,11 +1,10 @@
-
 import streamlit as st
 import openai
 import random
 from datetime import datetime
 
-# Set your OpenAI API key
-openai.api_key = "YOUR_OPENAI_API_KEY"
+# Securely load OpenAI API key from Streamlit secrets
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Sponsor ads
 sponsors = [
@@ -78,15 +77,21 @@ if query:
         st.stop()
 
     with st.spinner('Fetching news summaries...'):
-        summaries = generate_news_summaries(query_date)
+        try:
+            summaries = generate_news_summaries(query_date)
 
-        if len(summaries) != 10:
-            st.error("Validation failed, regenerating summaries...")
-            st.stop()
+            if len(summaries) != 10:
+                st.error("Validation failed, regenerating summaries...")
+                st.stop()
 
-        random.shuffle(sponsors)
+            random.shuffle(sponsors)
 
-        for i, summary in enumerate(summaries):
-            st.markdown(f"**{i+1}. {summary}**")
-            st.markdown(sponsors[i])
-            st.markdown('---')
+            for i, summary in enumerate(summaries):
+                st.markdown(f"**{i+1}. {summary}**")
+                st.markdown(sponsors[i])
+                st.markdown('---')
+
+        except openai.error.AuthenticationError:
+            st.error("Invalid API Key. Please check your Streamlit secrets configuration.")
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
