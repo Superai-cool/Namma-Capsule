@@ -80,10 +80,6 @@ if query:
         try:
             summaries = generate_news_summaries(query_date)
 
-            if len(summaries) != 10:
-                st.error("Validation failed, regenerating summaries...")
-                st.stop()
-
             random.shuffle(sponsors)
 
             for i, summary in enumerate(summaries):
