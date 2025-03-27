@@ -104,9 +104,9 @@ if user_input:
                 summary = summary.strip()
                 if summary:
                     # Display summary + sponsor, then a divider
-                    st.markdown(f\"{summary}\\n\\n{sponsor_lines[idx]}\")
-                    st.markdown(\"---\")
+                    st.markdown(f"{summary}\n\n{sponsor_lines[idx]}")
+                    st.markdown("---")
         else:
-            st.error(\"❌ Error: Summaries count mismatch. Please regenerate.\")
+            st.error("❌ Error: Summaries count mismatch. Please regenerate.")
     else:
-        st.error(\"Please type your question in the correct format: Top 10 Bangalore news today or Top 10 Bangalore news [DATE].\")
+        st.error("Please type your question in the correct format: Top 10 Bangalore news today or Top 10 Bangalore news [DATE].")
