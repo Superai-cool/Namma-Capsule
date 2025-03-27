@@ -45,10 +45,13 @@ categories = [
     "Infrastructure/Transport",
 ]
 
-# Function to validate input
+# Function to validate user input
 def validate_input(input_text):
+    # If user requests today's news
     if input_text.strip().lower() == "top 10 bangalore news today":
         return datetime.today().strftime("%B %d, %Y")
+    
+    # Otherwise check if user used the 'Top 10 Bangalore news [DATE]' format
     try:
         prefix = "top 10 bangalore news "
         if input_text.strip().lower().startswith(prefix):
@@ -57,21 +60,23 @@ def validate_input(input_text):
             return date_obj.strftime("%B %d, %Y")
     except:
         return None
+    
     return None
 
-# GPT Prompt builder
+# Build the prompt for GPT
 def build_prompt(valid_date):
     prompt = (
-        f"You are 'Namma Capsule', a hyper-local news summarizer exclusively focused on delivering the Top 10 daily news summaries relevant to Bangalore, across 10 fixed categories. "
+        "You are 'Namma Capsule', a hyper-local news summarizer exclusively focused on delivering "
+        "the Top 10 daily news summaries relevant to Bangalore, across 10 fixed categories. "
         f"Generate exactly 10 concise news summaries, each belonging to these fixed categories: {', '.join(categories)}. "
         f"Each summary must begin with the sequential number (1–10), category, and date ({valid_date}), and never exceed 60 words. "
-        f"Each summary ends with source line in markdown (📰 Source: Name – [Read More](https://example.com)) and a sponsor line provided by the user, randomly shuffled. "
-        f"Always separate each summary with a horizontal divider (---). Never miss any categories. "
-        f"If fresh news is unavailable for any category, include relevant Bangalore-based throwback, policy explainer, or event info."
+        "Each summary ends with source line in markdown (📰 Source: Name – [Read More](https://example.com)) and a sponsor line provided by the user, randomly shuffled. "
+        "Always separate each summary with a horizontal divider (---). Never miss any categories. "
+        "If fresh news is unavailable for any category, include relevant Bangalore-based throwback, policy explainer, or event info."
     )
     return prompt
 
-# Function to get summaries from OpenAI
+# Get summaries from OpenAI
 def get_summaries(prompt):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -81,27 +86,30 @@ def get_summaries(prompt):
     )
     return response.choices[0].message.content
 
-# Main Logic
+# Main logic
 if user_input:
     valid_date = validate_input(user_input)
     if valid_date:
+        # Build prompt and get GPT-generated summaries
         prompt = build_prompt(valid_date)
         news_summaries = get_summaries(prompt)
         
-        # Shuffle sponsor lines
+        # Shuffle the sponsor lines on each request
         random.shuffle(sponsor_lines)
         
-        # Split summaries
+        # Split the GPT output on the horizontal divider
         summary_list = news_summaries.split("---")
         
-        # Display summaries
+        # Expect exactly 10 items
         if len(summary_list) == 10:
             for idx, summary in enumerate(summary_list):
-                summary = summary.strip()
-                if summary:
-                    st.markdown(f"{summary}\n\n{sponsor_lines[idx]}")
+                clean_summary = summary.strip()
+                if clean_summary:
+                    # Display each summary plus a sponsor line, then another divider
+                    st.markdown(f"{clean_summary}\n\n{sponsor_lines[idx]}")
                     st.markdown("---")
         else:
             st.error("❌ Error: Summaries count mismatch. Please regenerate.")
     else:
+        # Error if user used an unsupported format
         st.error("Please type your question in the correct format: Top 10 Bangalore news today or Top 10 Bangalore news [DATE].")
