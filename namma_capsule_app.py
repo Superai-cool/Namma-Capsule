@@ -3,7 +3,12 @@ import openai
 import random
 from datetime import datetime
 
-# Set OpenAI API key
+# 1. Check if 'openai_api_key' is in st.secrets
+if "openai_api_key" not in st.secrets:
+    st.error("❌ OpenAI API key is missing. Please add 'openai_api_key' to Streamlit secrets and re-run.")
+    st.stop()
+
+# 2. Set OpenAI API key
 openai.api_key = st.secrets["openai_api_key"]
 
 # Title
@@ -57,12 +62,17 @@ def validate_input(input_text):
 # GPT Prompt builder
 def build_prompt(valid_date):
     prompt = (
-        f"You are 'Namma Capsule', a hyper-local news summarizer exclusively focused on delivering the Top 10 daily news summaries relevant to Bangalore, across 10 fixed categories."
-        f"Generate exactly 10 concise news summaries, each belonging to these fixed categories: {', '.join(categories)}."
-        f"Each summary must begin with the sequential number (1–10), category, and date ({valid_date}), and never exceed 60 words."
-        f"Each summary ends with source line in markdown (📰 Source: Name – [Read More](https://example.com)) and a sponsor line provided by the user, randomly shuffled."
-        f"Always separate each summary with a horizontal divider (---). Never miss any categories."
-        f"If fresh news is unavailable for any category, include relevant Bangalore-based throwback, policy explainer, or event info."
+        f"You are 'Namma Capsule', a hyper-local news summarizer exclusively focused on delivering "
+        f"the Top 10 daily news summaries relevant to Bangalore, across 10 fixed categories. "
+        f"Generate exactly 10 concise news summaries, each belonging to these fixed categories: "
+        f"{', '.join(categories)}. "
+        f"Each summary must begin with the sequential number (1–10), category, and date ({valid_date}), "
+        f"and never exceed 60 words. "
+        f"Each summary ends with source line in markdown (📰 Source: Name – [Read More](https://example.com)) "
+        f"and a sponsor line provided by the user, randomly shuffled. "
+        f"Always separate each summary with a horizontal divider (---). Never miss any categories. "
+        f"If fresh news is unavailable for any category, include relevant Bangalore-based throwback, "
+        f"policy explainer, or event info."
     )
     return prompt
 
